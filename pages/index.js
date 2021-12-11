@@ -1,45 +1,67 @@
-
-import React, {useState,useEffect} from 'react'
-import { Card , Button } from 'semantic-ui-react'
+import React, { Component } from 'react';
+import { Card, Button} from 'semantic-ui-react';
 import factory from '../ethereum/factory';
 import Layout from '../components/Layout';
-import {Link} from '../routes'
-function index(props) {
-    console.log(props.campaigns);
-    const items= props.campaigns.map( (ele)=>{
-        return {
-            header: ele,
-            description:
-            (
-             <Link route={`campaigns/${ele}`}>
-                <a>View Details</a>
-             </Link>
-            ),
-            fluid:true
-        }
-    })
+import { Link } from '../routes';
+import Campaign from '../ethereum/campaign.js';
+
+class CampaginIndex extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      items: null,
+      summary: null
+    }
+  }
+  static async getInitialProps() {
+    const campaigns = await factory.methods.getDeployedCampaigns().call();
+
+    return {campaigns};
+  }
+
+  async componentDidMount(){
+    const c = Campaign(this.props.campaigns[0]);
+    const summary = await Promise.all(this.props.campaigns.map((campaign, i) => Campaign(this.props.campaigns[i]).methods.getSummary().call()));
+    this.setState({summary});
+  }
+
+  renderCampaigns() {
+    let summ;
+    const items = this.props.campaigns.map( (address, i) => {
+      if (this.state.summary) summ = this.state.summary[i];
+      else summ = {"5": "null", "7":"null"};
+      return{
+        key:i,
+        image: <img src={summ[7]} style={ {width:150, height: 150}} />,
+        header: summ[5],
+        meta: address,
+        description: <div>
+                      <Link route={`/campaigns/${address}`}><a>View Campaign &nbsp;</a></Link>
+                      <a href={`http://localhost:3000/?name=${summ[5]}&description=${summ[6]}`}>Coummunity</a>
+                    </div>,
+        fluid:true,
+        style: {overflowWrap: 'break-word'}
+      };
+    });
+
+    return <Card.Group  items = {items} />;
+  }
+
+  render(){
     return (
-        <Layout>
+      <Layout>
         <div>
-            <h3>Active Projects</h3>
-            <Link route="campaigns/new">
+          <h3> Open Campaigns </h3>
+          <Link route="/campaigns/new">
             <a>
-            <Button
-                floated="right"
-                content="create a Project Funding" 
-                icon="add circle"
-                primary={true}
-            />
+              <Button floated="right" content="Create Campaign" icon="add circle" primary />
             </a>
-            </Link>
-            <Card.Group items={items}/>
+          </Link>
+          {this.renderCampaigns()}
         </div>
-        </Layout>
-    )
+      </Layout>
+  );
+  }
 }
-index.getInitialProps = async ()=>
-{
-    const campaigns=await factory.methods.getDeployedCampaigns().call();
-    return { campaigns };
-}
-export default index
+
+export default CampaginIndex;
