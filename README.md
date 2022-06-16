@@ -1,6 +1,6 @@
-# Project-Funding-DAPP![11]
+# Project-Funding-DAPP
 #List of all Ongoing Projects
-(https://user-images.githubusercontent.com/56218641/173999692-7a52651b-7648-4956-b118-89da83748134.png)
+![11](https://user-images.githubusercontent.com/56218641/173999692-7a52651b-7648-4956-b118-89da83748134.png)
 
 #Details of an ongoing project
 ![12](https://user-images.githubusercontent.com/56218641/173999877-3c25b96d-b063-42de-8e11-d569a0461542.png)
